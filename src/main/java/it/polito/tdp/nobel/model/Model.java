@@ -21,78 +21,81 @@ public class Model {
 		migliore = new HashSet<>();
 		mediaMigliore = 0.0;
 		
-		Set<Esame> parziale = new HashSet<>();  
+		Set<Esame> parziale = new HashSet<>();
 		
 		cercaMeglio(parziale, 0, numeroCrediti);
 		
 		return migliore;		
-
 	}
 	
-	private void cercaMeglio(Set<Esame> parziale, int L, int numeroCrediti) {
+	private void cercaMeglio(Set<Esame> parziale, int livello, int numeroCrediti) {
+		int somma = sommaCrediti(parziale);
 		
-		int sommaCrediti = sommaCrediti(parziale);
-		
-		if (sommaCrediti > numeroCrediti)
+		if(somma > numeroCrediti) {
+			//non ho una soluzione
 			return;
+		}
 		
-		if (sommaCrediti == numeroCrediti) {//potrei avere una soluzione qui
+		if (somma == numeroCrediti) {
+			//posso avere una soluzione
 			double mediaVoti = calcolaMedia(parziale);
-			if (mediaVoti > mediaMigliore) {
+			if(mediaVoti > mediaMigliore) {
 				mediaMigliore = mediaVoti;
 				migliore = new HashSet<>(parziale);
 			}
 			return;
 		}
 		
-		if (L == allEsami.size())
+		if(livello == allEsami.size()) {
 			return;
+			
+		}
 		
-		// provo ad aggiungere il prossimo elemento
-		//L=0 {e1} 			  / {}
-		//L=1 {e1, e2} - {e1} / {e2} - {}	
+		//provo ad aggiungere il prossimo elemento
+		//livello = 0 {e1} / {}
+		//livello = 1 {e1, e2} - {e1} / {e2} - {}
 		
-		parziale.add(allEsami.get(L));
-		cercaMeglio(parziale, L+1, numeroCrediti);
-		parziale.remove(allEsami.get(L));
+		parziale.add(allEsami.get(livello));
+		cercaMeglio(parziale, livello+1, numeroCrediti);
+		parziale.remove(allEsami.get(livello));
 		
-		// provo a non aggiungere il prossimo elemento
-		cercaMeglio(parziale, L+1, numeroCrediti);	
+		//provo a non aggiungere il prossimo elemento
+		cercaMeglio(parziale, livello+1, numeroCrediti);
 		
 	}
-
-	private void cerca(Set<Esame> parziale, int L, int numeroCrediti) {
+	
+	private void cerca(Set<Esame> parziale, int livello, int numeroCrediti) {
+		//condizioni di uscita
+		int somma = sommaCrediti(parziale);
 		
-		int sommaCrediti = sommaCrediti(parziale);
-		
-		if (sommaCrediti > numeroCrediti)
+		if(somma > numeroCrediti) {
+			//non ho una soluzione
 			return;
+		}
 		
-		if (sommaCrediti == numeroCrediti) {//potrei avere una soluzione qui
+		if (somma == numeroCrediti) {
+			//posso avere una soluzione
 			double mediaVoti = calcolaMedia(parziale);
-			if (mediaVoti > mediaMigliore) {
+			if(mediaVoti > mediaMigliore) {
 				mediaMigliore = mediaVoti;
 				migliore = new HashSet<>(parziale);
 			}
 			return;
 		}
 		
-		if (L == allEsami.size())
+		if(livello == allEsami.size()) {
 			return;
-		
-		// se arrivo qui, numeroCrediti > sommaCrediti
-		
-		for (Esame e : allEsami) {
-			
-			if (!parziale.contains(e)) {
-				parziale.add(e);
-				cerca(parziale, L+1, numeroCrediti);
-				parziale.remove(e);
-				
-			}
 			
 		}
 		
+		//se sono arrivato a questo punto: numeroCrediti > sommaCrediti, posso continuare con la ricorsione
+		for(Esame e : allEsami) {
+			if(!parziale.contains(e)) {
+				parziale.add(e);
+				cerca(parziale, livello+1, numeroCrediti);
+				parziale.remove(e);
+			}
+		}
 		
 	}
 
